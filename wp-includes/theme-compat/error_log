@@ -1,0 +1,4 @@
+[11-Apr-2017 01:00:01 Europe/Kiev] PHP Fatal error:  Call to undefined function _deprecated_file() in /home/stroyka/public_html/wp-includes/theme-compat/footer.php on line 9
+[11-Apr-2017 01:45:21 Europe/Kiev] PHP Fatal error:  Call to undefined function _deprecated_file() in /home/stroyka/public_html/wp-includes/theme-compat/comments.php on line 10
+[11-Apr-2017 05:01:28 Europe/Kiev] PHP Fatal error:  Call to undefined function _deprecated_file() in /home/stroyka/public_html/wp-includes/theme-compat/header.php on line 9
+[11-Apr-2017 07:34:36 Europe/Kiev] PHP Fatal error:  Call to undefined function _deprecated_file() in /home/stroyka/public_html/wp-includes/theme-compat/sidebar.php on line 9

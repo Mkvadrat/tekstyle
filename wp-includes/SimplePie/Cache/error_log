@@ -1,0 +1,5 @@
+[03-Apr-2017 01:48:13 Europe/Kiev] PHP Fatal error:  Class 'SimplePie_Cache_DB' not found in /home/stroyka/public_html/wp-includes/SimplePie/Cache/MySQL.php on line 58
+[11-Apr-2017 01:11:35 Europe/Kiev] PHP Fatal error:  Class 'SimplePie_Cache_DB' not found in /home/stroyka/public_html/wp-includes/SimplePie/Cache/MySQL.php on line 58
+[11-Apr-2017 01:34:13 Europe/Kiev] PHP Fatal error:  Interface 'SimplePie_Cache_Base' not found in /home/stroyka/public_html/wp-includes/SimplePie/Cache/DB.php on line 52
+[11-Apr-2017 02:27:30 Europe/Kiev] PHP Fatal error:  Interface 'SimplePie_Cache_Base' not found in /home/stroyka/public_html/wp-includes/SimplePie/Cache/File.php on line 52
+[11-Apr-2017 18:08:12 Europe/Kiev] PHP Fatal error:  Interface 'SimplePie_Cache_Base' not found in /home/stroyka/public_html/wp-includes/SimplePie/Cache/DB.php on line 52

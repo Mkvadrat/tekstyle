@@ -1,0 +1,13 @@
+
+
+# BEGIN WordPress
+
+# END WordPress
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Сделайте пакет «ea-php55» языком программирования «PHP» по умолчанию.
+<IfModule mime_module>
+AddType application/x-httpd-ea-php55 .php .php5 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+
