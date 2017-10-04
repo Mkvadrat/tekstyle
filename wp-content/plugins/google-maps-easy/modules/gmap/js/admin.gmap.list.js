@@ -36,6 +36,7 @@ jQuery(document).ready(function(){
 			,	totalRowsSelected = selectedRowIds.length;
 			if(totalRowsSelected) {
 				jQuery('#gmpGmapRemoveGroupBtn').removeAttr('disabled');
+				jQuery('#gmpGmapCloneGroupBtn').removeAttr('disabled');
 				if(totalRowsSelected == totalRows) {
 					jQuery('#cb_'+ tblId).prop('indeterminate', false);
 					jQuery('#cb_'+ tblId).attr('checked', 'checked');
@@ -44,6 +45,7 @@ jQuery(document).ready(function(){
 				}
 			} else {
 				jQuery('#gmpGmapRemoveGroupBtn').attr('disabled', 'disabled');
+				jQuery('#gmpGmapCloneGroupBtn').attr('disabled', 'disabled');
 				jQuery('#cb_'+ tblId).prop('indeterminate', false);
 				jQuery('#cb_'+ tblId).removeAttr('checked');
 			}
@@ -53,6 +55,7 @@ jQuery(document).ready(function(){
 	,	gridComplete: function(a, b, c) {
 			var tblId = jQuery(this).attr('id');
 			jQuery('#gmpGmapRemoveGroupBtn').attr('disabled', 'disabled');
+			jQuery('#gmpGmapCloneGroupBtn').attr('disabled', 'disabled');
 			jQuery('#cb_'+ tblId).prop('indeterminate', false);
 			jQuery('#cb_'+ tblId).removeAttr('checked');
 			/*if(jQuery('#'+ tblId).jqGrid('getGridParam', 'records'))	// If we have at least one row - allow to clear whole list
@@ -96,9 +99,13 @@ jQuery(document).ready(function(){
 	jQuery('#'+ tblId+ 'EmptyMsg').insertAfter(jQuery('#'+ tblId+ '').parent());
 	jQuery('#'+ tblId+ '').jqGrid('navGrid', '#'+ tblId+ 'Nav', {edit: false, add: false, del: false});
 	jQuery('#cb_'+ tblId+ '').change(function(){
-		jQuery(this).attr('checked') 
-			? jQuery('#gmpGmapRemoveGroupBtn').removeAttr('disabled')
-			: jQuery('#gmpGmapRemoveGroupBtn').attr('disabled', 'disabled');
+		if(jQuery(this).attr('checked')) {
+			jQuery('#gmpGmapRemoveGroupBtn').removeAttr('disabled');
+			jQuery('#gmpGmapCloneGroupBtn').removeAttr('disabled');
+		} else {
+			jQuery('#gmpGmapRemoveGroupBtn').attr('disabled', 'disabled');
+			jQuery('#gmpGmapCloneGroupBtn').attr('disabled', 'disabled');
+		}
 	});
 	jQuery('#gmpGmapRemoveGroupBtn').click(function(){
 		var selectedRowIds = jQuery('#gmpGmapTbl').jqGrid ('getGridParam', 'selarrrow')
@@ -119,6 +126,35 @@ jQuery(document).ready(function(){
 			jQuery.sendFormGmp({
 				btn: this
 			,	data: {mod: 'gmap', action: 'removeGroup', listIds: listIds}
+			,	onSuccess: function(res) {
+					if(!res.error) {
+						jQuery('#gmpGmapTbl').trigger( 'reloadGrid' );
+					}
+				}
+			});
+		}
+		return false;
+	});
+	jQuery('#gmpGmapCloneGroupBtn').click(function(){
+		var selectedRowIds = jQuery('#gmpGmapTbl').jqGrid ('getGridParam', 'selarrrow')
+		,	mapLabel = ''
+		,	listIds = [];
+
+		for(var i in selectedRowIds) {
+			var rowData = jQuery('#gmpGmapTbl').jqGrid('getRowData', selectedRowIds[ i ]);
+			listIds.push( rowData.id );
+		}
+		if(listIds.length == 1) {	// In table label cell there can be some additional links
+			var labelCellData = gmpGetGridColDataById(listIds[0], 'title', 'gmpGmapTbl');
+			mapLabel = labelCellData;
+		}
+		var confirmMsg = listIds.length > 1
+			? toeLangGmp('Are you sur want to clone '+ listIds.length+ ' Maps?')
+			: toeLangGmp('Are you sure want to clone "'+ mapLabel+ '" Map?');
+		if(confirm(confirmMsg)) {
+			jQuery.sendFormGmp({
+				btn: this
+			,	data: {mod: 'gmap', action: 'cloneMapGroup', listIds: listIds}
 			,	onSuccess: function(res) {
 					if(!res.error) {
 						jQuery('#gmpGmapTbl').trigger( 'reloadGrid' );

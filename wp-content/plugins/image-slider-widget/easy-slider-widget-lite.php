@@ -3,10 +3,10 @@
 Plugin Name: Image Slider (Lite)
 Plugin URI: http://www.ghozylab.com/plugins/
 Description: Image Slider (Lite) - Displaying your image as slider in post/page/widget/sidebar area with very easy.<a href="http://demo.ghozylab.com/plugins/easy-image-slider-plugin/pricing/" target="_blank"><strong> Upgrade to Pro Version Now</strong></a> and get a tons of awesome features.
-Author: GhozyLab, Inc.
+Author: Image Slider Team - GhozyLab
 Text Domain: image-slider-widget
 Domain Path: /languages
-Version: 1.1.91
+Version: 1.1.95
 Author URI: http://www.ghozylab.com/plugins/
 */
 
@@ -42,7 +42,7 @@ define( 'EWIC_API_URL', 'http://secure.ghozylab.com/' );
 if (!defined("EWIC_PLUGIN_SLUG")) define("EWIC_PLUGIN_SLUG","image-slider-widget/easy-slider-widget-lite.php");
 
 if ( !defined( 'EWIC_VERSION' ) ) {
-	define( 'EWIC_VERSION', '1.1.91' );
+	define( 'EWIC_VERSION', '1.1.95' );
 	}
 
 if ( !defined( 'EWIC_NAME' ) ) {
@@ -286,7 +286,7 @@ if ( is_admin() ){
 	include_once( dirname( __FILE__ ) . '/inc/pages/ewic-featured.php' );
 	include_once( dirname( __FILE__ ) . '/inc/pages/ewic-pricing.php' ); 
 	include_once( dirname( __FILE__ ) . '/inc/pages/ewic-settings.php' );
-	include_once( dirname( __FILE__ ) . '/inc/pages/ewic-addons.php' );
+	include_once( dirname( __FILE__ ) . '/inc/pages/ewic-freethemes.php' );
 	include_once( dirname( __FILE__ ) . '/inc/ewic-notice.php' );
 	include_once( dirname( __FILE__ ) . '/inc/pages/ewic-welcome.php' );
 	
@@ -334,7 +334,9 @@ function plugin_ewic_auto_update() {
 	{
 		require_once( ABSPATH . "wp-admin/includes/class-wp-upgrader.php" );
 		require_once( ABSPATH . "wp-admin/includes/misc.php" );
-		define( "FS_METHOD", "direct" );
+		if ( !defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+			}
 		require_once( ABSPATH . "wp-includes/update.php" );
 		require_once( ABSPATH . "wp-admin/includes/file.php" );
 		wp_update_plugins();

@@ -17,7 +17,7 @@ class ewic_sc_widget extends WP_Widget {
 	
         extract( $args );
 		
-		if ( isset ( $instance['ewic_shortcode'] ) ) {
+		if ( isset ( $instance['ewic_shortcode'] ) && $instance['ewic_shortcode'] != 'select' ) {
 		
         	$ewic_shortcode = $instance['ewic_shortcode'];
 			

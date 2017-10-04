@@ -21,8 +21,16 @@ function ewic_free_plugin_page() {
 		"locale" => get_locale(),
 	);
 	$args = apply_filters( "install_plugins_table_api_args_$tab", $args );
-	$api = plugins_api( "query_plugins", $args );
-	$item = $api->plugins;
+	
+	$cache_key = 'ghozylab_plugins_' . md5( 'free_plugins' );
+	
+	if ( false === ( $item = get_transient( $cache_key ) ) ) {
+
+		$api = plugins_api( "query_plugins", $args );
+		$item = $api->plugins;
+		set_transient( $cache_key, $item, 60*60*24 );
+		
+	}
 	
 	$plugins_allowedtags = array(
 		'a' => array( 'href' => array(), 'title' => array(), 'target' => array() ),
@@ -219,7 +227,7 @@ color: #FFF !important;
 			 */
 			$action_links = apply_filters( 'plugin_install_action_links', $action_links, $plugin );
 		?>
-		<div class="plugin-card drop-shadow lifted">
+		<div id="<?php echo $plugin["slug"]; ?>" class="plugin-card drop-shadow lifted">
 			<div class="plugin-card-top" style="min-height: 160px !important;">
             <?php if ( isset( $plugin["slug"] ) && $plugin["slug"] == 'easy-media-gallery' ) {echo '<div class="most_popular"></div>';} ?>
 				<a href="<?php echo esc_url( $details_link ); ?>" class="thickbox plugin-icon"><img width="128" height="128" src="<?php echo esc_attr( $plugin_icon_url ) ?>" /></a>
@@ -296,7 +304,37 @@ color: #FFF !important;
      	</div>	
 	</div>       
 </div>    
-	</form>   
+	</form>
+    
+<script type="text/javascript">   
+
+(function($) {
+
+$.fn.ewicReOrder = function(array) {
+  return this.each(function() {
+
+    if (array) {    
+      for(var i=0; i < array.length; i++) 
+        array[i] = $('div[id="' + array[i] + '"]');
+
+      $(this).empty();  
+
+      for(var i=0; i < array.length; i++)
+        $(this).append(array[i]);      
+    }
+  });    
+}
+})(jQuery);
+
+
+jQuery(document).ready(function($) {
+	
+	var ewicList = ['easy-media-gallery', 'contact-form-lite', 'feed-instagram-lite', 'image-slider-widget', 'gallery-lightbox-slider', 'image-carousel','icon', 'easy-notify-lite'];
+	
+	$('#the-list').ewicReOrder(ewicList);
+	
+});
+</script>
     
 
 <?php 

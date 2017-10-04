@@ -108,6 +108,9 @@ gmpGoogleMarker.prototype.showInfoWnd = function( forceUpdateInfoWnd ) {
 				allMapMArkers[i].hideInfoWnd();
 			}
 		}
+		if(parseInt(this.getMap().getParam('center_on_cur_marker_infownd')) && !GMP_DATA.isAdmin) {
+			this.getMap().setCenter(this.getMarkerParam('position'));
+		}
 		this._infoWindow.open(this._map.getRawMapInstance(), this._markerObj);
 		this._infoWndOpened = true;
 	}
@@ -129,6 +132,9 @@ gmpGoogleMarker.prototype.getRawMarkerInstance = function() {
 gmpGoogleMarker.prototype.getRawMarkerParams = function() {
 	return this._markerParams;
 };
+gmpGoogleMarker.prototype.getIcon = (function() {
+	return this._markerObj.getIcon();
+});
 gmpGoogleMarker.prototype.setIcon = function(iconPath) {
 	this._markerObj.setIcon( iconPath );
 };
@@ -343,3 +349,5 @@ function _gmpPrepareMarkersList(markers, params) {
 	}
 	return markers;
 }
+
+window.gmpGoogleMarker = gmpGoogleMarker;

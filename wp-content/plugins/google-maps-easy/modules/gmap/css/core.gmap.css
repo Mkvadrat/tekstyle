@@ -7,6 +7,16 @@
 	position: relative; 
 	left: -6px;
 }
+.gmpMapDetailsContainer {
+	position: relative;
+}
+.gmpMapDetailsContainer > i.fa {
+	position: absolute;
+	top: 45%;
+	left: 50%;
+	font-size: 30px;
+	z-index: 999;
+}
 .gmp_MapPreview img { 
 	max-width: none !important; 
 }
@@ -22,4 +32,8 @@
 /* Fix for prevent applying of third party styles to google map infowindows */
 .gmp_map_opts .gm-style-iw>div:first-child {
 	overflow: auto !important;
+}
+.gmp_map_opts img, .gmp_map_opts img {
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
 }

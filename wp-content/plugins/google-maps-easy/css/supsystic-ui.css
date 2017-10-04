@@ -764,3 +764,12 @@ input[type="color"] {
 a.search-choice-close {
 	transition-duration: 0s;
 }
+/* Fix styles for Right to Left languages */
+html[dir="rtl"] .supsystic-plugin .supsystic-content .supsystic-navigation {
+	margin-right: 0;
+}
+
+html[dir="rtl"] .supsystic-plugin .supsystic-content .supsystic-container {
+	margin-right: 75px;
+	margin-left: 0;
+}

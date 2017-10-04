@@ -3,7 +3,8 @@ class  gmapGmp extends moduleGmp {
 	private $_stylizations = array();
 	private $_markersLists = array();
 	private $_mapsInPosts = array();
-	
+	public $_mapsInPostsParams = array();
+
 	public function init() {
 		dispatcherGmp::addFilter('mainAdminTabs', array($this, 'addAdminTab'));
 		add_action('wp_head', array($this, 'addMapStyles'));
@@ -52,6 +53,23 @@ class  gmapGmp extends moduleGmp {
 							}
 							$matches['MAP_ID'] = array_map('intval', $matches['MAP_ID']);
 							$this->_mapsInPosts = array_merge($this->_mapsInPosts, $matches['MAP_ID']);
+
+							if(!empty($matches[0])) {
+								foreach($matches[0] as $data) {
+									preg_match_all('/(?P<KEYS>\w+)=["|\'](?P<VALUES>.*)["|\']/iU', $data, $params);
+									if(!is_array($params['KEYS'])) {
+										$params['KEYS'] = array( $params['KEYS'] );
+									}
+									if(!is_array($params['VALUES'])) {
+										$params['VALUES'] = array( $params['VALUES'] );
+									}
+									$map_params = array();
+									foreach($params['KEYS'] as $key => $val) {
+										$map_params[$val] = $params['VALUES'][$key];
+									}
+									$this->_mapsInPostsParams = array_merge($this->_mapsInPostsParams, array($map_params));
+								}
+							}
 						}
 					}
 				}
@@ -62,8 +80,13 @@ class  gmapGmp extends moduleGmp {
 	public function addMapStyles() {
 		if(!empty($this->_mapsInPosts)) {
 			$mapsOnPage = $this->getView()->getMapsObj();
+			$iter = 0;
 
 			foreach($mapsOnPage as $map) {
+				if(!empty($this->_mapsInPostsParams[$iter])) {
+					$this->_mapsInPostsParams[$map['view_id']] = $this->_mapsInPostsParams[$iter];
+				}
+				$iter++;
 				echo $this->getView()->addMapStyles($map['view_id']);
 			}
 		}
@@ -108,6 +131,9 @@ class  gmapGmp extends moduleGmp {
 	}
 	public function getEditMapLink($id) {
 		return frameGmp::_()->getModule('options')->getTabUrl('gmap_edit'). '&id='. $id;
+	}
+	public function getCountriesList() {
+		return require_once($this->getModDir(). 'countries.php');
 	}
 	public function getStylizationsList() {
 		if(empty($this->_stylizations)) {

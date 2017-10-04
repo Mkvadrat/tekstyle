@@ -599,4 +599,7 @@ class utilsGmp {
 		}
 		return false;
 	}
+	static public function classExists($name) {
+		return !empty($name) && class_exists($name) ? true : false;
+	}
 }

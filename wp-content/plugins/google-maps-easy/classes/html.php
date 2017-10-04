@@ -492,6 +492,9 @@ class htmlGmp {
             $params['slide'] = 'toeSliderMove';
         }
         if(!empty($params)) {
+			if(isset($params['min']) && empty($params['min'])) {
+				$params['min'] = 0;
+			}
             $paramsArr = array();
             foreach($params as $k => $v) {
 				if(in_array($k, array('attrs')) || strpos($k, '-')) continue;
@@ -501,7 +504,7 @@ class htmlGmp {
             $paramsStr = implode(', ', $paramsArr);
         }
 
-        $res = '<div id="toeSliderDisplay_'. $id. '" class="toeSliderDisplay">'. (empty($params['value']) ? '' : $params['value']) . ' meter' .  '</div>';
+        $res = '<div id="toeSliderDisplay_'. $id. '" class="toeSliderDisplay">'. (isset($params['value']) ? $params['value'] . ' meter(s)' : '') . '</div>';
         $res .= '<div id="'. $id. '"></div>';
         $params['attrs'] = 'id="toeSliderInput_'. $id. '"';
         $res .= self::hidden($name, $params);

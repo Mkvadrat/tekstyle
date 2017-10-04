@@ -4,6 +4,8 @@ class gmapViewGmp extends viewGmp {
 	private $_gmapApiUrl = '';
 	private static $_mapsData;
 	private $_mapsObj = array();
+	private $_shortCodeHtmlParams = array('width', 'height', 'align');
+	private $_paramsCanNotBeEmpty = array('width', 'height');
 	private $_mapStyles = array();
 	private $_displayColumns = array();
 	// Used to compare rand IDs and original IDs on preview
@@ -30,6 +32,9 @@ class gmapViewGmp extends viewGmp {
 		if(!empty($params))
 			self::$_mapsData[] = $params;
 	}
+	public function getMapData(){
+		return self::$_mapsData;
+	}
 	public function getMapsObj() {
 		if(empty($this->_mapsObj)) {
 			$mapsInPosts = $this->getModule()->getMapsInPosts();
@@ -47,6 +52,11 @@ class gmapViewGmp extends viewGmp {
 	}
 	public function addMapStyles($mapViewId) {
 		$mapObj = is_array($mapViewId) ? $mapViewId : $this->_mapsObj[$mapViewId];
+		$mapsInPostsParams = $this->getModule()->_mapsInPostsParams;
+
+		if(!empty($mapsInPostsParams) && !empty($mapsInPostsParams[$mapObj['view_id']])) {
+			$mapObj = $this->applyShortcodeHtmlParams($mapObj, $mapsInPostsParams[$mapObj['view_id']]);
+		}
 		$this->assign('currentMap', $mapObj);
 		array_push($this->_mapStyles, $mapObj['view_id']);
 
@@ -54,6 +64,7 @@ class gmapViewGmp extends viewGmp {
 	}
 	public function drawMap($params) {
 		$mapObj = array();
+		$mapMarkersGroupsList = array();
 
 		foreach($this->_mapsObj as $view_id => $map) {
 			if($map['id'] == $params['id'] && !$map['isDisplayed']) {
@@ -62,16 +73,114 @@ class gmapViewGmp extends viewGmp {
 				break;
 			}
 		}
-
 		$mapObj = $mapObj ? $mapObj : frameGmp::_()->getModule('gmap')->getModel()->getMapById($params['id']);
 
-		if(empty($mapObj)) return 
-			isset($params['id']) ? sprintf(__('Map with ID %d not found', GMP_LANG_CODE), $params['id']) : __('Map not found', GMP_LANG_CODE);
+		if(empty($mapObj)){
+			return isset($params['id'])
+				? sprintf(__('Map with ID %d not found', GMP_LANG_CODE), $params['id'])
+				: __('Map not found', GMP_LANG_CODE);
+		}
+		$mapObj = $this->applyShortcodeHtmlParams($mapObj, $params);
+		$mapObj = $this->applyShortcodeMapParams($mapObj, $params);
 
-		$shortCodeHtmlParams = array('width', 'height', 'align');
-		$paramsCanNotBeEmpty = array('width', 'height');
+		if(isset($params['plugin-info']) && $params['plugin-info'] == 'Membership-by-Supsystic' && isset($params['membership-params'])) {
+			$membershipModule = frameGmp::_()->getModule('membership');
+			if($membershipModule) {
+				$membershipModel = $membershipModule->getModel('membership_presets');
+				if($membershipModel) {
+					$params = $membershipModel->prepareParamsWithMarkers($params);
+					$membershipModel->replaceMapsParamsForMembership($mapObj, $params);
+				}
+			}
+		}
+
+		if(!empty($mapObj['markers'])) {
+			if(!empty($params['marker_show_description'])) {
+				foreach($mapObj['markers'] as $key => $marker) {
+					if(isset($marker['params']['show_description'])) {
+						unset($mapObj['markers'][$key]['params']['show_description']);
+					}
+					if($marker['id'] == $params['marker_show_description']) {
+						$mapObj['markers'][$key]['params']['show_description'] = 1;
+					}
+				}
+			}
+			if(!empty($params['marker_category'])) {
+				$category = explode(',', $params['marker_category']);
+				foreach($mapObj['markers'] as $key => $marker) {
+					if(in_array($marker['marker_group_id'], $category)) continue;
+					unset($mapObj['markers'][$key]);
+				}
+				$mapObj['markers'] = array_values($mapObj['markers']);	// 'reindex' array
+			}
+		}
+		if(isset($params['display_as_img']) && $params['display_as_img']) {
+			$mapObj['params']['map_display_mode'] = 'popup';
+			$mapObj['params']['img_width'] = isset($params['img_width']) ? $params['img_width'] : 175;
+			$mapObj['params']['img_height'] = isset($params['img_height']) ? $params['img_height'] : 175;
+		}
+		if(isset($params['display_as_img']) && $params['display_as_img']) {
+			$mapObj['params']['map_display_mode'] = 'popup';
+		}
+		if($mapObj['params']['map_display_mode'] == 'popup') {
+			frameGmp::_()->addScript('jquery-ui-dialog', '', array('jquery'));
+			frameGmp::_()->getModule('templates')->loadJqueryUi();
+			frameGmp::_()->addStyle('supsystic-uiGmp', GMP_CSS_PATH. 'supsystic-ui.css');
+			frameGmp::_()->getModule('templates')->loadFontAwesome();
+		}
+		if(empty($mapObj['params']['map_display_mode'])){
+			$mapObj['params']['map_display_mode'] = 'map';
+		}
+		if($mapMarkersGroupsList) {
+			$mapObj['marker_groups'] = frameGmp::_()->getModule('marker_groups')->getModel()->getMarkersGroupsByIds($mapMarkersGroupsList);
+		}
+
+		$mapObj['params']['markers_list_type'] = isset($params['markers_list_type'])
+			? $params['markers_list_type']
+			: (isset($mapObj['params']['markers_list_type']) && !empty($mapObj['params']['markers_list_type']))
+				? $mapObj['params']['markers_list_type']
+				: '';
+		$mapObj = dispatcherGmp::applyFilters('mapDataRender', $mapObj);
+		$mapObj['params']['ss_html'] = $this->generateSocialSharingHtml($mapObj);
+
+		$this->connectMapsAssets( $mapObj['params'] );
+
+		// for Membership activity Map add window
+		if(!empty($params['membership-integrating'])) {
+			$this->assign('mbsIntegrating', $params['id']);
+			$mapObj['mbs_presets'] = 1;
+		}
+		// for Membership activity draw post
+		if(!empty($params['membership-id'])) {
+			$this->assign('mbsMapId', $params['membership-id']);
+			if(!empty($params['membership-params'])) {
+				$this->assign('mbsMapInfo', json_encode($params['membership-params']));
+			}
+			$mapObj['mbs_created'] = 1;
+		}
+
+		frameGmp::_()->addScript('frontend.gmap', $this->getModule()->getModPath(). 'js/frontend.gmap.js', array('jquery'), false, true);
+		$this->addMapData(dispatcherGmp::applyFilters('mapDataToJs', $mapObj));
+
+		$this->assign('markersDisplayType', $mapObj['params']['markers_list_type']);
+		$this->assign('currentMap', $mapObj);
+		$res = '';
+		if(!in_array($mapObj['view_id'], $this->_mapStyles)) {
+			$res .= $this->addMapStyles($mapObj);
+		}
+		return ($res. parent::getInlineContent('gmapDrawMap'));
+	}
+	public function applyShortcodeHtmlParams($mapObj, $params){
+		foreach($this->_shortCodeHtmlParams as $code) {
+			if(isset($params[$code])){
+				if(in_array($code, $this->_paramsCanNotBeEmpty) && empty($params[$code])) continue;
+				$mapObj['html_options'][$code] = $params[$code];
+			}
+		}
+		return $mapObj;
+	}
+	public function applyShortcodeMapParams($mapObj, $params){
 		$shortCodeMapParams = $this->getModel()->getParamsList();
-		$mapMarkersGroupsList = array();
 
 		if(isset($params['map_center']) && is_string($params['map_center'])) {
 			if(strpos($params['map_center'], ';')) {
@@ -105,80 +214,13 @@ class gmapViewGmp extends viewGmp {
 				unset($params['map_center']);
 			}
 		}
-		if(!empty($params['marker_show_description'])) {
-			if(!empty($mapObj['markers'])) {
-				foreach($mapObj['markers'] as $key => $marker) {
-					if(isset($marker['params']['show_description'])) {
-						unset($mapObj['markers'][$key]['params']['show_description']);
-					}
-					if($marker['id'] == $params['marker_show_description']) {
-						$mapObj['markers'][$key]['params']['show_description'] = 1;
-					}
-				}
-			}
-		}
-		if(!empty($mapObj['markers'])) {
-			foreach($mapObj['markers'] as $marker) {
-				if($marker['marker_group_id']) {
-					if(in_array($marker['marker_group_id'], $mapMarkersGroupsList)) continue;
-
-					array_push($mapMarkersGroupsList, $marker['marker_group_id']);
-				}
-			}
-		}
-		foreach($shortCodeHtmlParams as $code) {
-			if(isset($params[$code])){
-				if(in_array($code, $paramsCanNotBeEmpty) && empty($params[$code])) continue;
-				$mapObj['html_options'][$code] = $params[$code];
-			}
-		}
 		foreach($shortCodeMapParams as $code){
 			if(isset($params[$code])) {
-				if(in_array($code, $paramsCanNotBeEmpty) && empty($params[$code])) continue;
+				if(in_array($code, $this->_paramsCanNotBeEmpty) && empty($params[$code])) continue;
 				$mapObj['params'][$code] = $params[$code];
 			}
 		}
-		if(isset($params['display_as_img']) && $params['display_as_img']) {
-			$mapObj['params']['map_display_mode'] = 'popup';
-			$mapObj['params']['img_width'] = isset($params['img_width']) ? $params['img_width'] : 175;
-			$mapObj['params']['img_height'] = isset($params['img_height']) ? $params['img_height'] : 175;
-		}
-		if(isset($params['display_as_img']) && $params['display_as_img']) {
-			$mapObj['params']['map_display_mode'] = 'popup';
-		}
-		if($mapObj['params']['map_display_mode'] == 'popup') {
-			frameGmp::_()->addScript('jquery-ui-dialog', '', array('jquery'));
-			frameGmp::_()->getModule('templates')->loadJqueryUi();
-			frameGmp::_()->addStyle('supsystic-uiGmp', GMP_CSS_PATH. 'supsystic-ui.css');
-			frameGmp::_()->getModule('templates')->loadFontAwesome();
-		}
-		if(empty($mapObj['params']['map_display_mode'])){
-			$mapObj['params']['map_display_mode'] = 'map';
-		}
-		if($mapMarkersGroupsList) {
-			$mapObj['marker_groups'] = frameGmp::_()->getModule('marker_groups')->getModel()->getMarkersGroupsByIds($mapMarkersGroupsList);
-		}
-
-		$mapObj['params']['markers_list_type'] = isset($params['markers_list_type'])
-			? $params['markers_list_type']
-			: (isset($mapObj['params']['markers_list_type']) && !empty($mapObj['params']['markers_list_type']))
-				? $mapObj['params']['markers_list_type']
-				: '';
-		$mapObj = dispatcherGmp::applyFilters('mapDataRender', $mapObj);
-
-		$this->connectMapsAssets( $mapObj['params'] );
-		$this->addMapData(dispatcherGmp::applyFilters('mapDataToJs', $mapObj));
-
-		frameGmp::_()->addScript('frontend.gmap', $this->getModule()->getModPath(). 'js/frontend.gmap.js', array('jquery'), false, true);
-
-		$this->assign('markersDisplayType', $mapObj['params']['markers_list_type']);
-		$this->assign('currentMap', $mapObj);
-
-		$res = '';
-		if(!in_array($mapObj['view_id'], $this->_mapStyles)) {
-			$res .= $this->addMapStyles($mapObj);
-		}
-		return ($res. parent::getInlineContent('gmapDrawMap'));
+		return $mapObj;
 	}
 	public function addMapDataToJs(){
 		frameGmp::_()->addJSVar('frontend.gmap', 'gmpAllMapsInfo', self::$_mapsData);
@@ -224,6 +266,7 @@ class gmapViewGmp extends viewGmp {
 		$positionsList = $this->getModule()->getControlsPositions();
 		$stylizationsForSelect = array('none' => __('None', GMP_LANG_CODE),);
 		$markerGroupsForSelect = array('0' => __('None', GMP_LANG_CODE),);
+		$isContactFormsInstalled = utilsGmp::classExists('frameCfs');
 
 		frameGmp::_()->getModule('templates')->loadJqGrid();
 		frameGmp::_()->addScript('jquery-ui-sortable');
@@ -286,6 +329,7 @@ class gmapViewGmp extends viewGmp {
 		$this->assign('editMap', $editMap);
 		$this->assign('isPro', $isPro);
 		$this->assign('icons', frameGmp::_()->getModule('icons')->getModel()->getIcons(array('fields' => 'id, path, title')));
+		$this->assign('countries', $this->getModule()->getCountriesList());
 		$this->assign('stylizationsForSelect', $stylizationsForSelect);
 		$this->assign('positionsList', $positionsList);
 		$this->assign('mainLink', frameGmp::_()->getModule('supsystic_promo')->getMainLink());
@@ -294,8 +338,42 @@ class gmapViewGmp extends viewGmp {
 		$this->assign('viewId', $editMap ? $map['view_id'] : 'preview_id_'. mt_rand(1, 9999));
 		$this->assign('promoModPath', frameGmp::_()->getModule('supsystic_promo')->getModPath());
 
+		if($isContactFormsInstalled) {
+			frameGmp::_()->addJSVar('admin.gmap.edit', 'gmpContactFormEditUrl', frameCfs::_()->getModule('options')->getTabUrl('forms_edit'));
+			$this->assign('contactFormsForSelect', $this->getAllContactForms());
+		}
+		$this->assign('isContactFormsInstalled', $isContactFormsInstalled);
+
+		$membershipModule = frameGmp::_()->getModule('membership');
+		if($membershipModule) {
+			$membershipModel = $membershipModule->getModel('membership_presets');
+			if(!$membershipModel) {
+				$this->assign('membershipPluginError', __('Error inside google maps plugin.', GMP_LANG_CODE));
+			} elseif($membershipModel->isPluginActive() === null) {
+				$this->assign('pluginInstallUrl', $membershipModel->getPluginInstallUrl());
+			} elseif(!$membershipModel->isPluginActive()) {
+				$this->assign('membershipPluginError', __('To use this feature, You need to reactivate your Google Maps Easy plugin.'), GMP_LANG_CODE );
+			} else {
+				$this->assign('canUseMembershipFeature', 1);
+			}
+		} else {
+			$this->assign('membershipPluginError', __('To use this feature, You need to reactivate your Google Maps Easy plugin.'), GMP_LANG_CODE );
+		}
+
 		return parent::getContent('gmapEditMap');
 	}
+	public function getAllContactForms() {
+		$formsList = array();
+		$forms = frameCfs::_()->getModule('forms')->getModel()->getSimpleList('original_id != 0 AND ab_id = 0');
+		
+		if($forms) {
+			foreach($forms as $f) {
+				$formsList[ $f['id'] ] = $f['label'];
+			}
+		}
+		return $formsList;
+	}
+
 	public function connectMapsAssets($params, $forAdminArea = false) {
 		$params['language'] = isset($params['language']) && !empty($params['language']) ? $params['language'] : utilsGmp::getLangCode2Letter();
 
@@ -310,5 +388,16 @@ class gmapViewGmp extends viewGmp {
 		frameGmp::_()->addStyle('core.gmap', $this->getModule()->getModPath(). 'css/core.gmap.css');
 
 		dispatcherGmp::doAction('afterConnectMapAssets', $params, $forAdminArea);
+	}
+
+	public function generateSocialSharingHtml($map) {
+		$res = '';
+		$socialSharingHtml = apply_filters('supsystic_gmap_sm_html', '', $map);
+
+		if(!empty($socialSharingHtml)) {
+			$res = $socialSharingHtml;
+		}
+
+		return $res;
 	}
 }

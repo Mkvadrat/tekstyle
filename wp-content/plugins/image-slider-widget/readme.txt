@@ -1,24 +1,25 @@
  === Slider ===
 Contributors: GhozyLab
 Donate link: https://ghozy.link/rs3bq
-Tags: slider, image slider, photo slider, picture slider, responsive slider, slider plugin, slideshow, wordpress slider, wordpress slideshow, wp slider, slide, image
+Tags: slider, image slider, photo slider, picture slider, responsive slider, slider plugin, slideshow, WordPress slider, slider image, wp slider, images, image
 Requires at least: 3.5
-Tested up to: 4.7.2
-Stable tag: 1.1.91
+Tested up to: 4.8
+Stable tag: 1.1.95
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Slider Plugin - The best responsive image slider for your posts, page or sidebar.
+Slider - The best and very easy slider plugin for your post, page or sidebar. 100% Responsive.
 
 == Description ==
+[Homepage](http://demo.ghozylab.com/plugins/easy-image-slider-plugin/) | [Documentation](https://www.youtube.com/watch?v=-W8u_t05K2Y) | [Support](https://ghozylab.com/plugins/submit-support-request/#tab-1399384216-2-4) | [Demo](http://demo.ghozylab.com/plugins/easy-image-slider-plugin/image-slider-with-thumbnails-at-the-bottom/) | [Premium Version](http://demo.ghozylab.com/plugins/easy-image-slider-plugin/image-slider-with-thumbnails-on-left/)
 
-= About Slider Plugin =
-**Image Slider** plugin is the best **[slider](http://demo.ghozylab.com/plugins/easy-image-slider-plugin/?utm_source=wordpress&utm_medium=description-link&utm_campaign=slider "image slider plugin")** plugin for your post/page/widget or sidebar area. You can be able to generate beautiful image sliders entirely. There is a huge amount of settings that you may tweak, including perfect transition effects, prev/next navigation, bullets with thumbnails, auto play, pause/stop and other options. You just assign a variety of styles, colors and effects into your slider. There is simply no knowledge of programming necessary in any way. You wont need to type a single line of code!
+= About Image Slider =
+**Slider Image** plugin is the best **[image slider](http://demo.ghozylab.com/plugins/easy-image-slider-plugin/?utm_source=wordpress&utm_medium=description-link&utm_campaign=slider "slider plugin")** plugin for your wp sites. You can be able to generate beautiful image slider entirely. There is a huge amount of settings that you may tweak, including perfect transition effects, prev/next navigation, bullets with thumbnails, auto play, pause/stop and other options. You just assign a variety of styles, colors and effects into your slider. There is simply no knowledge of programming necessary in any way. You wont need to type a single line of code!
 
-The slider is extremely easy to use. The shortcode generator also make you to insert the **slider** to your post, page and widget easily.
+This slider plugin is extremely easy to use. The shortcode generator also make you to insert the **slider** to your post, page and widget easily.
 
 = Responsive Slider =
-This [slider](https://wordpress.org/plugins/image-slider-widget/ "slider image") plugin is 100% **responsive** and compatible with mobile, tablets, desktop computers and all modern web browsers which include iPhone, iPad, Android, Chrome, Safari, Firefox, Opera, Internet Explorer 7/8/9/10/11 and also Microsoft Edge.
+The [slider](https://wordpress.org/plugins/image-slider-widget/ "slider") is 100% **responsive** and compatible with mobile, tablets, desktop computers and all modern web browsers which include iPhone, iPad, Android, Chrome, Safari, Firefox, Opera, Internet Explorer 7/8/9/10/11 and also Microsoft Edge.
 
 ### Live Demo
 > 
@@ -42,7 +43,7 @@ This [slider](https://wordpress.org/plugins/image-slider-widget/ "slider image")
 > * Browser support: Firefox, Chrome, Safari, iOS, Android, IE7+
 
 = Slider / Image Slider =
-You can create **image slider** just in minutes, with awesome features you can easily add image into slider, drag & drop an images to re-order to fit your needs. **No need to Re-Upload** all your images because the plugin will use an images from your media library.
+You can create image **slider** just in minutes, with awesome features you can easily add an images into the slider, drag & drop an images to re-order to fit your needs. **No need to Re-Upload** all your images because the plugin will use an images from your media library.
 You can also select and insert multiple images into your slider only by click **CTRL + Click** on each images that you choose. Yep, it's 100% Slider that very easy to use.
 
 = Image Lightbox =
@@ -96,13 +97,13 @@ When touch the Slider, it will freeze and then move to the direction that finger
 ### Recommended Plugins
 The following are other recommended plugins by the author:
 
-* [Best Gallery Plugin](https://wordpress.org/plugins/easy-media-gallery/ "Best Gallery Plugin") - Easy Media Gallery is a wordpress plugin designed to display various media support including grid gallery, galleries, photo album, multiple photo albums, portfolio, photo gallery or image gallery.
-* [Best Contact Form Plugin](https://wordpress.org/plugins/contact-form-lite/ "Best Contact Form Plugin") - The Best Contact Form Plugin to create awesome Contact Form in minutes.
-* [Instagram Plugin](https://wordpress.org/plugins/feed-instagram-lite/ "Instagram") - Display your Instagram media as masonry gallery in WordPress site with very easily.
-* [Web Icon Fonts Plugin](https://wordpress.org/plugins/icon/ "Icon Fonts Plugin") - Select and insert icon into your post or page just in one click. More than 2.5k icons available. 
-* [Best Popup Plugin](https://wordpress.org/plugins/easy-notify-lite/ "Best Email Subscribe and Optin Plugin") - The Best Notify and Subscription Form Plugin to display notify popup, announcement and subscribe form with very ease, fancy and elegant.
-* [Best Image Carousel](https://wordpress.org/plugins/image-carousel/ "image carousel") - Touch enabled WordPress plugin that lets you create a beautiful responsive image carousel.
-* [Best Gallery Lightbox](https://wordpress.org/plugins/gallery-lightbox-slider/ "Gallery Lightbox") - Gallery Lightbox - Displays all gallery images into the lightbox slider in just a few seconds.
+* [Image Gallery](https://wordpress.org/plugins/easy-media-gallery/ "Gallery") - Easy Media Gallery is a wordPress plugin designed to display various media support including grid gallery, galleries, photo album, multiple photo albums, portfolio, photo gallery, image slider or image gallery.
+* [Contact Form](https://wordpress.org/plugins/contact-form-lite/ "Best Contact Form Plugin") - The Best Contact Form Plugin to create awesome Contact Form in minutes.
+* [Instagram Feed](https://wordpress.org/plugins/feed-instagram-lite/ "Instagram") - Display your Instagram media as masonry gallery in WordPress site with very easily.
+* [Icon Fonts Plugin](https://wordpress.org/plugins/icon/ "Icon Fonts Plugin") - Select and insert icon into your post or page just in one click. More than 2.5k icons available. 
+* [Popup Builder](https://wordpress.org/plugins/easy-notify-lite/ "Best Email Subscribe and Optin Plugin") - The Best Notify and Subscription Form Plugin to display notify popup, announcement and subscribe form with very ease, fancy and elegant.
+* [Image Carousel](https://wordpress.org/plugins/image-carousel/ "image carousel") - Touch enabled WordPress plugin that lets you create a beautiful responsive image carousel.
+* [Best Gallery](https://wordpress.org/plugins/gallery-lightbox-slider/ "Gallery Lightbox") - Gallery Lightbox - Displays all gallery images into the lightbox slider in just a few seconds.
 
 = Translation =
 
@@ -194,22 +195,34 @@ There are no complicated instructions for using Image Slider plugin because this
 
 == Upgrade Notice ==
 
-= 1.1.91 =
+= 1.1.95 =
 IMPORTANT! SECURITY BUGS FIX, PLEASE UPDATE NOW!
 
 == Changelog ==
 
+= 1.1.95 =
+* Fixed : Many other PHP and CSS clean and optimization
+* Update : Welcome page styles
+* Timestamp : none
+
+= 1.1.93 =
+* Fixed : Many other PHP and CSS clean and optimization
+* Update : WordPress 4.8 compatibility
+* Timestamp : 06/06/17 17:33:28
+
 = 1.1.91 =
 * Fixed : Slider not appear when only available one slider in widget list
-* Update : WordPress 4.7.2 compatibility
+* Update : WordPress 4.7.3 compatibility
+* Timestamp : 03/25/17 23:13:39
 
 = 1.1.90 =
 * IMPORTANT! SECURITY BUGS FIX, PLEASE UPDATE NOW!
+* Timestamp : 12/28/16 02:16:48
 
 = 1.1.89 =
 * Tweak : Shortcode Manager Interface
 * Update : WordPress 4.6.1 compatibility
-* Timestamp : none
+* Timestamp : 09/15/16 09:24:12
 
 = 1.1.87 =
 * Update : WordPress 4.6 compatibility

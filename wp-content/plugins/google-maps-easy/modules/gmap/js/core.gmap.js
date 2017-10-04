@@ -382,7 +382,7 @@ gmpGoogleMap.prototype.addHeatmap = function(params) {
 gmpGoogleMap.prototype.getMarkerById = function(id) {
 	if(this._markers && this._markers.length) {
 		for(var i in this._markers) {
-			if(this._markers[ i ].getId() == id)
+			if(this._markers[i].getId && this._markers[i].getId() == id)
 				return this._markers[ i ];
 		}
 	}
@@ -484,6 +484,20 @@ gmpGoogleMap.prototype.getId = function() {
 gmpGoogleMap.prototype.refresh = function() {
 	return google.maps.event.trigger(this.getRawMapInstance(), 'resize');
 };
+gmpGoogleMap.prototype.refreshWithCenter = (function(lat, lng, zoom) {
+	var res = google.maps.event.trigger(this.getRawMapInstance(), 'resize');
+	if(zoom) {
+		this.setZoom(zoom);
+	} else {
+		this.setZoom(this.getZoom());
+	}
+	if(lat && lng) {
+		this.setCenter(lat, lng);
+	} else {
+		this.setCenter(this.getCenter().lat(), this.getCenter().lng());
+	}
+	return res;
+});
 gmpGoogleMap.prototype.fullRefresh = function() {
 	this.refresh();
 	this.checkMarkersParams(this._markers, false);
@@ -507,11 +521,13 @@ gmpGoogleMap.prototype.resizeMapByHeight = function() {
 		function resizeHeight() {
 			var viewId = self.getParam('view_id')
 			,	mapContainer = jQuery('#gmpMapDetailsContainer_' + viewId)
-			,	mapContainerOffset = mapContainer.length ? mapContainer.offset() : false;
+			,	mapContainerOffset = mapContainer.length ? mapContainer.offset() : false
+			,	windowHeight = jQuery(window).height();
 
 			if(mapContainerOffset) {
 				jQuery('#gmpMapDetailsContainer_' + viewId + ', #' + self.getParam('view_html_id')).each(function () {
-					jQuery(this).height(jQuery(window).height() - mapContainerOffset.top);
+					var height = mapContainerOffset.top < windowHeight ? windowHeight - mapContainerOffset.top : windowHeight;
+					jQuery(this).height(height);
 				});
 				self.refresh();
 			}
@@ -525,6 +541,7 @@ gmpGoogleMap.prototype.resizeMapByHeight = function() {
 var g_gmpGeocoder = null;
 jQuery.fn.mapSearchAutocompleateGmp = function(params) {
 	params = params || {};
+
     jQuery(this).keyup(function(event){
 		// Ignore tab, enter, caps, end, home, arrows
 		if(toeInArrayGmp(event.keyCode, [9, 13, 20, 35, 36, 37, 38, 39, 40])) return;
@@ -540,19 +557,18 @@ jQuery.fn.mapSearchAutocompleateGmp = function(params) {
 
 			jQuery(this).autocomplete({
 				source: function(request, response) {
-					var autocomleateData = []
-					,	additionalData = typeof(params.additionalData) != 'undefined' ? params.additionalData : ''
-					,	geocoder = gmpGetGeocoder()	;
+					var autocomleateData = typeof(params.additionalData) != 'undefined' ? gmpAutocomleateData(params.additionalData, request.term) : []
+					,	geocoder = gmpGetGeocoder()
+					,	geocoderData = { 'address': searchData };
 
-					if(additionalData) {
-						autocomleateData = gmpAutocomleateData(additionalData, request.term)
+					if(typeof(params.geocoderParams) != 'undefined' && params.geocoderParams) {
+						geocoderData = jQuery.extend({}, geocoderData, params.geocoderParams)
 					}
-
-					geocoder.geocode({ 'address': searchData }, function(results, status) {
+					geocoder.geocode(geocoderData, function(results, status) {
 						params.msgEl.html('');
 
 						if(status == google.maps.GeocoderStatus.OK && results.length) {
-							for(var i in results) {
+							for(var i = 0; i < results.length; i++) {
 								autocomleateData.push({
 									label: results[i].formatted_address
 								,	lat: results[i].geometry.location.lat()
@@ -569,9 +585,9 @@ jQuery.fn.mapSearchAutocompleateGmp = function(params) {
 								var notFoundMsg = toeLangGmp('Nothing was found');
 
 								if(jQuery(self).parent().find('.ui-helper-hidden-accessible').size()) {
-									jQuery(self).parent().find('.ui-helper-hidden-accessible').html( notFoundMsg );
+									jQuery(self).parent().find('.ui-helper-hidden-accessible').html(notFoundMsg);
 								} else {
-									params.msgEl.html( notFoundMsg );
+									params.msgEl.html(notFoundMsg);
 								}
 							}
 						}
@@ -592,11 +608,11 @@ jQuery.fn.mapSearchAutocompleateGmp = function(params) {
 function gmpAutocomleateData(data, needle) {
 	var autocomleateData = [];
 
-	for(var i in data) {
-		for(var j in data[i]) {
+	for(var i = 0; i < data.length; i++) {
+		for(var j = 0; j < data[i].length; j++) {
 			var label = data[i][j].label.toLowerCase()
-			,	desc = data[i][j].marker_desc != 'undefined' ? data[i][j].marker_desc : ''
-			,	term = needle.toLowerCase();
+				,	desc = data[i][j].marker_desc != 'undefined' ? data[i][j].marker_desc : ''
+				,	term = needle.toLowerCase();
 
 			if(label.indexOf(term) !== -1 || (desc && desc.indexOf(term) !== -1)) {
 				autocomleateData.push(data[i][j]);
@@ -620,9 +636,14 @@ function changeInfoWndBgColor(map) {
 
 	if(infowndContent && infowndContent.length) {
 		infowndContent.each(function() {
-			jQuery(this).prev().children().last().css('background-color', color);
-			jQuery(this).prev().children(':nth-child(3)').children().last().prev().children().last().css('background-color', color);
-			jQuery(this).prev().children(':nth-child(3)').children().last().children().css('background-color', color);
+			var wndBody = jQuery(this).prev().children().last()
+			,	wndTail = jQuery(this).prev().children(':nth-child(3)').children().last();
+
+			wndBody.css('background-color', color);
+			wndTail.prev().children().last().css('background-color', color);
+			wndTail.children().css('background-color', color);
 		});
 	}
 }
+
+window.gmpGoogleMap = gmpGoogleMap;

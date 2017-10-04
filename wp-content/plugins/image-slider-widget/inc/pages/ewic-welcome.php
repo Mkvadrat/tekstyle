@@ -60,8 +60,8 @@ class EWIC_Welcome {
 			// Premium Plugins Page
     		add_submenu_page('edit.php?post_type=easyimageslider', 'Premium Plugins', 'Premium Plugins', $this->minimum_capability, 'ewic-premium-plugins', array( $this, 'premium_plugins_screen') );
 			
-			// Addons Page
-    		add_submenu_page('edit.php?post_type=easyimageslider', 'Addons', 'Addons', $this->minimum_capability, 'ewic-addons', array( $this, 'addons_plugins_screen') );
+			// Free Themes Page
+    		add_submenu_page('edit.php?post_type=easyimageslider', 'Free Themes', 'Free Themes', $this->minimum_capability, 'ewic-free-themes', array( $this, 'free_themes_screen') );
 			
 			// Earn EXTRA MONEY Page
     		add_submenu_page('edit.php?post_type=easyimageslider', 'Earn EXTRA MONEY', 'Earn EXTRA MONEY', $this->minimum_capability, 'ewic-earn-xtra-money', array( $this, 'earn_plugins_screen') );
@@ -85,9 +85,7 @@ class EWIC_Welcome {
 	public function ewic_admin_head() {
 		remove_submenu_page( 'edit.php?post_type=easyimageslider', 'ewic-changelog' );
 		remove_submenu_page( 'edit.php?post_type=easyimageslider', 'ewic-getting-started' );
-		//remove_submenu_page( 'edit.php?post_type=easyimageslider', 'ewic-free-plugins' );
 		remove_submenu_page( 'edit.php?post_type=easyimageslider', 'ewic-premium-plugins' );
-		remove_submenu_page( 'edit.php?post_type=easyimageslider', 'ewic-addons' );
 		remove_submenu_page( 'edit.php?post_type=easyimageslider', 'ewic-earn-xtra-money' );
 	
 		// Badge for welcome page
@@ -107,7 +105,9 @@ class EWIC_Welcome {
 						
 						if($(window).scrollTop() > ewicTabsPos.top) {
 							
-							$('.ewictabs').addClass('ewictabfixed');
+							if(! $('.theme-list-container').length) {
+								$('.ewictabs').addClass('ewictabfixed');
+							}
 							
 							}
 							
@@ -121,13 +121,239 @@ class EWIC_Welcome {
 					
 					}
 					
-				});		
+				function shorten_text(el, maxLength) {
+					var ret = el.text();
+					if (ret.length > maxLength) {
+						ret = ret.substr(0,maxLength-3) + "...";
+						}
+						el.text(ret).show();
+				}
+				
+				$('.ewic-free-theme-page').find('.theme-desc').each(function(){
+					shorten_text($(this), 300);
+				});
+					
+				$('.ewic-free-theme-page').find('.theme-details-ratings').each(function(){	
+					var $col = $(this).find(".rating-color");
+					for(var i = 0; i < 4; i++){
+						$col.clone().appendTo($(this));
+						}
+				});
+					
+		});		
 		
 		</script>
         
         
 		<style type="text/css" media="screen">
 		/*<![CDATA[*/
+		
+		/* Theme list */
+		
+		#ghozy-free-themes .feature-section {
+			margin-top:0;
+			padding-top:20px;	
+		}
+		.theme-list-container {
+			position: relative;
+			width: 100%;
+			display:block;
+		}
+		
+		ul.free-themes-list {
+			list-style-type: none;
+		}
+		
+		li.free-themes-item {
+			position:relative;
+			display:inline-block;
+			border:solid 1px #ccc;
+			float: left;
+			width: 48.8%;
+			margin: 0 2% 3% 0;
+			background-color: #fff;
+		}
+		
+		li.no-left-margin {
+		margin-right:0 !important;	
+		}
+		
+		.theme-details-cont {
+			position:relative;
+			padding: 15px;
+			border-top: 3px solid #e5e5e5;
+		}
+		
+		.theme-sc {
+			position:relative;
+			display: block;
+			vertical-align:top;
+			max-width: 100%;
+			max-height: 300px;
+			overflow-y: scroll;
+			overflow-x: hidden;
+		}
+		
+		.theme-sc img {
+			width: 100%;
+			height: auto;	
+			margin: 0;
+			padding: 0;
+			display: block;
+			vertical-align:top;
+			margin-bottom:0 !important;
+		}
+		
+		.theme-desc-cont {
+			width: 100%;	
+			position:relative;
+			display: block;
+			vertical-align:bottom;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+		
+		.theme-desc {
+			display: none;
+			margin-top: 10px;
+			color: #726f6f;
+			border-top: 1px solid #f1f1f1;
+			padding-top: 10px;
+			line-height: 1.5;
+		}
+		
+		.theme-desc-cont h3 {
+			margin: 0;
+			line-height: 1.9;
+			display: inline-block;
+		}
+		
+		.theme-by {
+			display: inline-block;
+			margin: 0 0 0 10px;
+			font-style:italic;
+			font-size: 14px;
+			position: relative;
+			top: -1px;
+		}
+		
+		.theme-details-footer {
+			position:relative;
+			display:block;
+			border-top: 1px solid #c2c2c2;
+			background-color: #efefef;
+			padding: 15px;
+			line-height: 1.6;
+		}
+		
+		.theme-details-ratings {
+			display: inline-block;
+			position: relative;
+			top: 5px;
+			margin-right: 5px;
+			width: auto;
+		}
+		
+		.rating-color {
+			color: #F90;
+			font-size: 16px;
+		}
+		
+		.rating-content {
+			display: inline-block;
+			position: relative;
+			font-size: 13px;
+		}
+		
+		.theme-details-actions {
+			display: inline-block;
+			position: relative;
+			text-align:right;
+			width:55%;
+		}
+		
+		.install-theme-now,
+		.switch-theme-now,
+		.upgrade-theme-now {
+			margin-left: 10px !important;
+		}
+		.button-secondary.upgrade-theme-now {
+			color: #fff;
+			border-color: #b77b2b;
+			background: #f0711e;
+			-webkit-box-shadow: 0 1px 0 #ccc;
+			box-shadow: 0 1px 0 #ccc;
+			vertical-align: top;
+		}
+		
+		.button-secondary.upgrade-theme-now:hover,
+		.button-secondary.upgrade-theme-now:active,
+		.button-secondary.upgrade-theme-now:focus {
+			color: #fff;
+			background: #e36820;
+			border-color: #c75100;
+		}
+		
+		.active-theme-cont {
+			display: inline-block;
+			position: relative;
+			text-align:right;
+			width:55%;
+		}
+		
+		.dashicons.active-theme {
+			color: #0C3;
+			margin-top: 4px;
+		}
+		
+		.current-active-theme {
+			
+		}
+		
+		/* Effect */
+		.drop-shadow:before,
+		.drop-shadow:after {
+			content:"";
+			position:absolute; 
+			z-index:-2;
+		}
+
+		/* Lifted corners */
+		
+		.lifted {
+			-moz-border-radius:4px; 
+				 border-radius:4px;
+		}
+		
+		.lifted:before,
+		.lifted:after { 
+			bottom:15px;
+			left:10px;
+			width:50%;
+			height:20%;
+			max-width:300px;
+			-webkit-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);   
+			   -moz-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+					box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+			-webkit-transform:rotate(-3deg);    
+			   -moz-transform:rotate(-3deg);   
+				-ms-transform:rotate(-3deg);   
+				 -o-transform:rotate(-3deg);
+					transform:rotate(-3deg);
+		}
+		
+		.lifted:after {
+			right:10px; 
+			left:auto;
+			-webkit-transform:rotate(3deg);   
+			   -moz-transform:rotate(3deg);  
+				-ms-transform:rotate(3deg);  
+				 -o-transform:rotate(3deg);
+					transform:rotate(3deg);
+		}
+		
+		/* End Theme List */
 		
 		a:focus {box-shadow: none !important; }
 		
@@ -452,8 +678,8 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 			<a class="nav-tab <?php echo $selected == 'ewic-getting-started' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'ewic-getting-started' ), 'edit.php?post_type=easyimageslider' ) ) ); ?>">
 				<?php _e( 'Getting Started', 'image-slider-widget' ); ?>
 			</a>
-			<a class="nav-tab <?php echo $selected == 'ewic-addons' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'ewic-addons' ), 'edit.php?post_type=easyimageslider' ) ) ); ?>">
-				<?php _e( 'Addons', 'image-slider-widget' ); ?>
+			<a class="nav-tab <?php echo $selected == 'ewic-free-themes' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'ewic-free-themes' ), 'edit.php?post_type=easyimageslider' ) ) ); ?>">
+				<?php _e( 'Free Themes', 'image-slider-widget' ); ?>
 			</a>
             
 			<a class="nav-tab <?php echo $selected == 'ewic-free-plugins' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'ewic-free-plugins' ), 'edit.php?post_type=easyimageslider' ) ) ); ?>">
@@ -501,7 +727,7 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 
 					<p><?php _e( 'Version 1.1.15 introduces a comprehensive welcome page interface. The easy way to get important informations about this product and other related plugins.', 'image-slider-widget' );?></p>
                     
-					<p><?php _e( 'In this page, you will find four important Tabs named Getting Started, Addons, Free Plugins, Premium Plugins and Extra.', 'image-slider-widget' );?></p>
+					<p><?php _e( 'In this page, you will find four important Tabs named Getting Started, Free Themes, Free Plugins, Premium Plugins and Extra.', 'image-slider-widget' );?></p>
 
 				</div>
 			</div>
@@ -618,6 +844,7 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 			</div>
 
 			<div class="ewic-container-cnt">
+
 				<h3><?php _e( 'Stay Up to Date', 'image-slider-widget' );?></h3>
 
 				<div class="feature-section">
@@ -695,16 +922,16 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 	
 	
 	/**
-	 * Render Addons Page
+	 * Render Free Themes Page
 	 *
 	 * @access public
 	 * @since 1.1.15
 	 * @return void
 	 */
-	public function addons_plugins_screen() {
+	public function free_themes_screen() {
 		list( $display_version ) = explode( '-', EWIC_VERSION );
 		?>
-		<div class="wrap about-wrap" id="ghozy-addons">
+		<div class="wrap about-wrap ewic-free-theme-page" id="ghozy-free-themes">
 			<h1><?php printf( __( 'Welcome to '.EWIC_NAME.'', 'image-slider-widget' ), $display_version ); ?></h1>
 			<div class="about-text"><?php printf( __( 'Thank you for installing '.EWIC_NAME.'. This plugin is ready to make your slider more fancy and better!', 'image-slider-widget' ), $display_version ); ?></div>
 			<div class="ewic-badge"><?php printf( __( 'Version %s', 'image-slider-widget' ), $display_version ); ?></div>
@@ -712,10 +939,8 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 			<?php $this->ewic_tabs(); ?>
 
 			<div class="ewic-container-cnt">
-			<p style="margin-bottom:50px;"class="about-description"></p>
-
 				<div class="feature-section">
-					<?php echo ewic_lite_get_addons_feed(); ?>
+					<?php if ( current_user_can( 'install_themes' ) ) echo ewic_lite_free_themes(); ?>
 				</div>
 			</div>
 
@@ -726,7 +951,7 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 	
 	
 	/**
-	 * Render Addons Page
+	 * Render Affiliate Page
 	 *
 	 * @access public
 	 * @since 1.1.15
@@ -735,7 +960,7 @@ background-image: -o-linear-gradient(top, #ffffff, #eeeeee);}
 	public function earn_plugins_screen() {
 		list( $display_version ) = explode( '-', EWIC_VERSION );
 		?>
-		<div class="wrap about-wrap" id="ghozy-addons">
+		<div class="wrap about-wrap" id="ghozy-earn">
 			<h1><?php printf( __( 'Welcome to '.EWIC_NAME.'', 'image-slider-widget' ), $display_version ); ?></h1>
 			<div class="about-text"><?php printf( __( 'Thank you for installing '.EWIC_NAME.'. This plugin is ready to make your slider more fancy and better!', 'image-slider-widget' ), $display_version ); ?></div>
 			<div class="ewic-badge"><?php printf( __( 'Version %s', 'image-slider-widget' ), $display_version ); ?></div>

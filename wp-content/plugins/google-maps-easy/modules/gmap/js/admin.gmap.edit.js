@@ -26,7 +26,10 @@ jQuery(window).bind('resize', _gmpResizeRightSidebar);
 jQuery(window).bind('orientationchange', _gmpResizeRightSidebar);
 
 jQuery(document).ready(function(){
-	var mapMainBtns = jQuery('#gmpMapMainBtns')
+	var propTabs = jQuery('#gmpMapPropertiesTabs')
+	,	$contactFormsListWnd = jQuery('#gmpInsertToContactFormWnd')
+	,	contactFormBtn = jQuery('#gmpInsertToContactForm')
+	,	mapMainBtns = jQuery('#gmpMapMainBtns')
 	,	markerMainBtns = jQuery('#gmpMarkerMainBtns')
 	,	shapeMainBtns = jQuery('#gmpShapeMainBtns')
 	,	heatmapMainBtns = jQuery('#gmpHeatmapMainBtns')
@@ -34,7 +37,7 @@ jQuery(document).ready(function(){
 	,	shapeList = jQuery('#gmpShapeList')
 	,	rightStickyBar = jQuery('#gmpMapRightStickyBar');
 
-	jQuery('#gmpMapPropertiesTabs').wpTabs({
+	propTabs.wpTabs({
 		change: function(selector) {
 			switch(selector) {
 				case '#gmpMarkerTab':
@@ -85,6 +88,48 @@ jQuery(document).ready(function(){
 			}
 		}
 	});
+	propTabs.show();
+
+	$contactFormsListWnd.dialog({
+		modal:    true
+	,	autoOpen: false
+	,	width: 540
+	,	height: 'auto'
+	,	buttons:  {
+			Cancel: function() {
+				$contactFormsListWnd.dialog('close');
+			}
+		,	Select: function() {
+				var formSelect = $contactFormsListWnd.find('select[name="contact_form"]');
+
+				if(formSelect.length && typeof(gmpContactFormEditUrl) != 'undefined') {
+					var id = formSelect.val();
+
+					window.open(gmpContactFormEditUrl + '&id=' + id + '&map_id=' + g_gmpMap.getId() + '#cfsFormFields', '_blank');
+					$contactFormsListWnd.dialog('close');
+				}
+			}
+		}
+	,	open: function() {
+			if(!$contactFormsListWnd.find('select[name="contact_form"]').length) {
+				$contactFormsListWnd.next('.ui-dialog-buttonpane').find('button:last-child').hide();
+			}
+		}
+	});
+	contactFormBtn.click(function(){
+		$contactFormsListWnd.dialog('open');
+		return false;
+	});
+
+	jQuery('#membershipPropEnable').on('ifChanged', function() {
+		if(jQuery('#membershipPropEnable:checked').length) {
+			jQuery('#membershipHiddenEnable').val('1');
+		} else {
+			jQuery('#membershipHiddenEnable').val('0');
+		}
+
+	});
+
 	// Preview map definition
 	gmpMainMap = typeof(gmpMainMap) === 'undefined' ? null : gmpMainMap;
 	var previewMapParams = {}
@@ -154,6 +199,7 @@ jQuery(document).ready(function(){
 					if(_gmpIsMarkerFormChanged() && jQuery('#gmpMarkerForm input[name="marker_opts[title]"]').val() != '') {
 						jQuery('#gmpMarkerForm').submit();
 					}
+					// Maybe here should be the saving of shape and heatmap forms
 					_gmpUnchangeMapForm();
 				}
 			}
@@ -288,13 +334,17 @@ jQuery(document).ready(function(){
 	// Map stylization
 	jQuery('#gmpMapForm select[name="map_opts[map_stylization]"]').change(function(){
 		var newType = jQuery(this).val();
+
+		// Common styles go first
 		if(newType !== 'none' && typeof(gmpAllStylizationsList[ newType ]) !== 'undefined') {
 			g_gmpMap.set('styles', gmpAllStylizationsList[ newType ]);
 		} else {
 			g_gmpMap.set('styles', false);
 		}
+		// Then we apply other styles options
 		if(GMP_DATA.isPro) {
-			gmpPoiToggle(g_gmpMap);
+			gmpStylesToggle(g_gmpMap, 'hide_poi');
+			gmpStylesToggle(g_gmpMap, 'hide_countries');
 		}
 	});
 	// Map Clasterization
@@ -605,10 +655,11 @@ function gmpWpColorpickerUpdateTitlesColor(color) {
 }
 function gmpAddCustomControlsOptions() {
 	var customMapControls = jQuery('#map_optsenable_custom_map_controls_check').prop('checked');
+
 	if (customMapControls) {
-		jQuery('#custom_controls_options').css('display', 'block');
+		jQuery('#custom_controls_options').show(300);
 	} else {
-		jQuery('#custom_controls_options').css('display', 'none');
+		jQuery('#custom_controls_options').hide(300);
 	}
 }
 function gmpSwitchClustererSubOpts(clusterType) {

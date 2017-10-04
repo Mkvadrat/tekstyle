@@ -32,6 +32,14 @@ class gmapControllerGmp extends controllerGmp {
 			$edit = false;
 		}
 		if($saveRes) {
+			// save Membership param
+			$membershipModule = frameGmp::_()->getModule('membership');
+			if($membershipModule) {
+				$membershipModel = $membershipModule->getModel('membership_presets');
+				if($membershipModel) {
+					$membershipModel->updateRow(array('maps_id' => $mapId, 'allow_use' => isset($data['map_opts']['membershipEnable']) ? $data['map_opts']['membershipEnable'] : 0));
+				}
+			}
 			$addMarkerIds = reqGmp::getVar('add_marker_ids');
 			if($addMarkerIds && !empty($addMarkerIds)) {
 				frameGmp::_()->getModule('marker')->getModel()->setMarkersToMap($addMarkerIds, $mapId);
@@ -66,6 +74,14 @@ class gmapControllerGmp extends controllerGmp {
 			$res->pushError($this->getModel()->getErrors());
 		$res->ajaxExec();
 	}
+	public function cloneMapGroup() {
+		$res = new responseGmp();
+		if($this->getModel()->cloneMapGroup(reqGmp::getVar('listIds', 'post'))) {
+			$res->addMessage(__('Done', GMP_LANG_CODE));
+		} else
+			$res->pushError($this->getModel()->getErrors());
+		$res->ajaxExec();
+	}
 	/*public function removeMap(){
 		$data=  reqGmp::get('post');
 		$res = new responseGmp();
@@ -86,7 +102,7 @@ class gmapControllerGmp extends controllerGmp {
 	/*public function getListForTable() {
 		$res = new responseGmp();
 		$res->ignoreShellData();
-		
+
 		$count = $this->getModel()->getCount();
 		$listReqData = array(
 			'limitFrom' => reqGmp::getVar('iDisplayStart'),
@@ -220,7 +236,7 @@ class gmapControllerGmp extends controllerGmp {
 	public function getPermissions() {
 		return array(
 			GMP_USERLEVELS => array(
-				GMP_ADMIN => array('getListForTbl', 'getAllMaps', 'save', 'clear', 'remove', 'removeGroup', 'resortMarkers')
+				GMP_ADMIN => array('getListForTbl', 'getAllMaps', 'save', 'clear', 'remove', 'removeGroup', 'cloneMapGroup', 'resortMarkers')
 			),
 		);
 	}

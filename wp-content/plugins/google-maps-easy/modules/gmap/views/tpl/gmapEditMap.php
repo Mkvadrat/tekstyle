@@ -9,7 +9,23 @@
 <section>
 	<div class="supsystic-item supsystic-panel">
 		<div id="containerWrapper">
-			<div id="gmpMapPropertiesTabs" class="supsistic-half-side-box">
+			<div id="gmpMapPropertiesTabs" class="supsistic-half-side-box" style="display: none;">
+				<button id="gmpInsertToContactForm" class="button"><?php _e('Insert to Contact Form', GMP_LANG_CODE)?></button>
+				<div class="mbs-turn-on-wrapper">
+					<?php
+					if(property_exists($this, 'membershipPluginError')) {
+						echo $this->membershipPluginError;
+					} else if(property_exists($this, 'pluginInstallUrl')) {
+						printf(__('Integrate with <a target="_blank" href="%s">Membership</a>', GMP_LANG_CODE), $this->pluginInstallUrl);
+					} else if(property_exists($this, 'canUseMembershipFeature') && $this->canUseMembershipFeature == 1) {
+						echo htmlGmp::checkboxHiddenVal('map_opts[membership-selectbox]', array(
+							'value' => isset($this->map['params']['membershipEnable']) ? $this->map['params']['membershipEnable'] : 0,
+							'attrs' => 'id="membershipPropEnable"',
+						));
+						echo '<label for="membershipPropEnable">' . _e('Enable for Membership', GMP_LANG_CODE) . '</label>';
+					}
+					?>
+				</div>
 				<h3 class="nav-tab-wrapper" style="margin-bottom: 0px; margin-top: 12px;">
 					<a class="nav-tab nav-tab-active" href="#gmpMapTab">
 						<p>
@@ -19,7 +35,7 @@
 					</a>
 					<a class="nav-tab" href="#gmpMarkerTab">
 						<p>
-							<i class="fa fa-map-marker"></i>
+							<i class="fa fa-map-marker" style="font-size: 18px;"></i>
 							<?php _e('Markers', GMP_LANG_CODE)?>
 							<button class="button" id="gmpAddNewMarkerBtn">
 								<?php _e('New', GMP_LANG_CODE)?>
@@ -89,7 +105,13 @@
 									<label for="map_opts_height">
 										<?php _e('Map Height', GMP_LANG_CODE)?>:
 									</label>
-									<i style="float: right;" class="fa fa-question supsystic-tooltip" title="<?php _e('Your map height. If Adapt map to screen height option is checked - map height will be recalculated on frontend and will be equals to: your device screen height - page header height. Recalculation will be done for maps in page content and widgets except of maps which displaying in Google Maps Easy widget popup (Display as image mode).', GMP_LANG_CODE)?>"></i>
+									<i style="float: right;" class="fa fa-question supsystic-tooltip" title="<?php _e('Your map height.
+									<br /><br />If Adapt map to screen height option is checked - map height will be recalculated on frontend and can be equals to:
+									<ul>
+									<li>1) your device screen height - height from top of page to top of map (if screen height > height from top of page to top of map)</li>
+									<li>2) your device screen height (in other cases)</li>
+									</ul>
+									Recalculation will be done for maps in page content and widgets except of maps which displaying in Google Maps Easy widget popup (Display as image mode).', GMP_LANG_CODE)?>"></i>
 								</th>
 								<td>
 									<div class="gmpMainHeightOpts" style="width: 50%; float: left;">
@@ -509,7 +531,8 @@
 										<label for="map_opts_add_kml_layers">
 											<?php _e('Add KML layers', GMP_LANG_CODE)?>:
 										</label>
-										<i class="fa fa-question supsystic-tooltip" style="float: right;" title="<?php _e('Add KML files to display custom layers on the map.', GMP_LANG_CODE);
+										<i class="fa fa-question supsystic-tooltip" style="float: right;" title="<?php _e('Add KML files to display custom layers on the map. Additional options:
+											<br /><br /><b>Enable KML layers filter</b> - add form to map for dynamically enable / disable KML layers and sublayers.', GMP_LANG_CODE);
 											if(!$this->isPro){
 												echo esc_html('<a href="'. $proLink. '" target="_blank"><img src="'. $this->promoModPath. 'img/kml/kml.png" /></a>');
 											}?>"
@@ -519,17 +542,26 @@
 										<?php }?>
 									</th>
 									<td>
-										<div id="gmpKmlFileRowExample" class="gmpKmlFileRow" style="display: none;">
+										<div style="margin-top: 10px;">
+											<label for="map_opts_enable_kml_filter">
+												<?php echo htmlGmp::checkboxHiddenVal('map_opts[enable_kml_filter]', array(
+													'value' => $this->editMap && isset($this->map['params']['enable_kml_filter']) ? $this->map['params']['enable_kml_filter'] : false,
+													'attrs' => 'class="gmpProOpt" id="map_opts_enable_kml_filter"'))?>
+												<?php _e('Enable KML layers filter', GMP_LANG_CODE)?>
+											</label>
+										</div>
+										<div id="gmpKmlFileRowExample" class="gmpKmlFileRow" style="display: none; margin-top: 10px;">
 											<div style="clear: both;"></div>
-											<label for="map_opts_kml_file_url">
-												<?php _e('Enter KML file URL', GMP_LANG_CODE)?>
-											</label></br>
+											<label><?php _e('Enter KML file URL', GMP_LANG_CODE)?></label>
+											<label class="gmpShowSublayersLabel" style="float: right;">
+												<?php echo htmlGmp::hidden('map_opts[kml_filter][show_sublayers][]', array('value' => '', 'attrs' => 'class="gmpShowSublayersInput gmpProOpt" disabled="disabled"'))?>
+												<?php _e('Hide Sublayers at KML filter', GMP_LANG_CODE)?>
+											</label>
+											<div style="clear: both;"></div>
 											<a href="#" title="<?php _e('Remove KML field', GMP_LANG_CODE)?>" class="button gmpProOpt" onclick="gmpKmlRemoveFileRowBtnClick(this); return false;">
 												<i class="fa fa-trash-o"></i>
 											</a>
-											<?php echo htmlGmp::text('map_opts[kml_file_url][]', array(
-												'value' => '',
-												'attrs' => 'class="gmpProOpt" style="width: 86%; float: right;" disabled="disabled"'))?>
+											<?php echo htmlGmp::text('map_opts[kml_file_url][]', array('value' => '', 'attrs' => 'class="gmpProOpt" style="width: 86%; float: right;" disabled="disabled"'))?>
 											<span class="gmpKmlUploadMsg" style="float: right; width: 100%; text-align: right;" ></span>
 											<a 	href="#"
 												class="gmpKmlUploadFileBtn button gmpProOpt"
@@ -546,12 +578,7 @@
 											</a><br />
 										</div>
 										<div id="gmpKmlFileRowsShell"></div>
-										<a
-											href="#"
-											class="button gmpProOpt"
-											id="gmpKmlAddFileRowBtn"
-											style="margin: 5px 5px 5px 0px; float: left;"
-											>
+										<a href="#" class="button gmpProOpt" id="gmpKmlAddFileRowBtn" style="margin: 5px 5px 5px 0px; float: left;">
 											<?php _e('Add more files', GMP_LANG_CODE)?>
 										</a>
 									</td>
@@ -632,6 +659,15 @@
 													'value' => $this->editMap && isset($this->map['params']['custom_controls_slider_max']) ? $this->map['params']['custom_controls_slider_max'] : '1000000',
 													'attrs' => 'class="gmpProOpt" style="width: 100%;" id="map_opts_custom_controls_slider_max"'))?>
 											</div>
+											<div style="margin-top: 10px;">
+												<label for="map_opts_custom_controls_search_country">
+													<?php _e('Search Country', GMP_LANG_CODE)?>
+												</label>
+												<?php echo htmlGmp::selectbox('map_opts[custom_controls_search_country]', array(
+													'options' => array_merge(array('' => 'All Countries'), $this->countries),
+													'value' => $this->editMap && isset($this->map['params']['custom_controls_search_country']) ? $this->map['params']['custom_controls_search_country'] : 'round',
+													'attrs' => 'class="gmpProOpt" style="width: 100%;" id="map_opts_custom_controls_search_country"'))?>
+											</div>
 										</div>
 									</td>
 								</tr>
@@ -671,6 +707,23 @@
 								</tr>
 								<tr>
 									<th scope="row">
+										<label for="map_opts_hide_countries">
+											<?php _e('Hide Countries', GMP_LANG_CODE)?>:
+										</label>
+										<i style="float: right;" class="fa fa-question supsystic-tooltip" title="<?php _e('Hide all administrative data about countries: names, borders ets.', GMP_LANG_CODE)?>"></i>
+										<?php if(!$this->isPro) { ?>
+											<?php $proLink = frameGmp::_()->getModule('supsystic_promo')->generateMainLink('utm_source=plugin&utm_medium=hide_countries&utm_campaign=googlemaps'); ?>
+											<br /><span class="gmpProOptMiniLabel"><a target="_blank" href="<?php echo $proLink?>"><?php _e('PRO option', GMP_LANG_CODE)?></a></span>
+										<?php }?>
+									</th>
+									<td>
+										<?php echo htmlGmp::checkboxHiddenVal('map_opts[hide_countries]', array(
+											'value' => $this->editMap && isset($this->map['params']['hide_countries']) ? $this->map['params']['hide_countries'] : false,
+											'attrs' => 'class="gmpProOpt"'))?>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">
 										<label for="map_opts_hide_marker icon title">
 											<?php _e('Hide Tooltips of Markers', GMP_LANG_CODE)?>:
 										</label>
@@ -680,6 +733,19 @@
 										<?php echo htmlGmp::checkboxHiddenVal('map_opts[hide_marker_tooltip]', array(
 											'value' => $this->editMap && isset($this->map['params']['hide_marker_tooltip']) ? $this->map['params']['hide_marker_tooltip'] : false,
 										))?>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">
+										<label for="map_opts_center_on_cur_marker_infownd">
+											<?php _e('Center on current opened marker', GMP_LANG_CODE)?>:
+										</label>
+										<i style="float: right;" class="fa fa-question supsystic-tooltip" title="<?php _e('On frontend the map will be centered on current marker with opened info window.', GMP_LANG_CODE)?>"></i>
+									</th>
+									<td>
+										<?php echo htmlGmp::checkboxHiddenVal('map_opts[center_on_cur_marker_infownd]', array(
+											'value' => $this->editMap && isset($this->map['params']['center_on_cur_marker_infownd']) ? $this->map['params']['center_on_cur_marker_infownd'] : false,
+											'attrs' => ''))?>
 									</td>
 								</tr>
 								<tr>
@@ -1019,6 +1085,7 @@
 						<?php echo htmlGmp::hidden('map_opts[id]', array('value' => $this->editMap ? $this->map['id'] : ''))?>
 						<?php echo htmlGmp::hidden('map_opts[map_center][coord_x]', array('value' => $this->editMap ? $this->map['params']['map_center']['coord_x'] : ''))?>
 						<?php echo htmlGmp::hidden('map_opts[map_center][coord_y]', array('value' => $this->editMap ? $this->map['params']['map_center']['coord_y'] : ''))?>
+						<?php echo htmlGmp::hidden('map_opts[membershipEnable]', array('value' => isset($this->map['params']['membershipEnable']) ? $this->map['params']['membershipEnable'] : 0, 'attrs' => 'id="membershipHiddenEnable"'))?>
 						<?php echo htmlGmp::hidden('map_opts[zoom]', array('value' => $this->editMap ? $this->map['params']['zoom'] : ''))?>
 					</form>
 				</div>
@@ -1259,13 +1326,17 @@
 										<label class="label-big" for="shape_opts_type">
 											<?php _e('Figure Type', GMP_LANG_CODE)?>:
 										</label>
-										<i style="float: right;" class="fa fa-question supsystic-tooltip" title="<?php _e('Type of your figure: polyline (a series of straight segments on the map) or polygon (area enclosed by a closed path (or loop), which is defined by a series of coordinates).', GMP_LANG_CODE)?>"></i>
+										<i style="float: right;" class="fa fa-question supsystic-tooltip" title="<?php _e('Type of your figure:
+										<br /><br /><b>Polyline</b> - a series of straight segments on the map.
+										<br /><br /><b>Polygon</b> - area enclosed by a closed path (or loop), which is defined by a series of coordinates.
+										<br /><br /><b>Circle</b> - circle shape,defined by center coordinates and radius.', GMP_LANG_CODE)?>"></i>
 									</th>
 									<td>
 										<?php echo htmlGmp::selectbox('shape_opts[type]', array(
 											'options' => array(
 												'polyline' => __('Polyline', GMP_LANG_CODE),
-												'polygon' => __('Polygon', GMP_LANG_CODE),),
+												'polygon' => __('Polygon', GMP_LANG_CODE),
+												'circle' => __('Circle', GMP_LANG_CODE),),
 											'value' => 'polyline',
 											'attrs' => 'style="width: 100%;"'))?>
 									</td>
@@ -1343,7 +1414,7 @@
 											<?php _e('Add by Click', GMP_LANG_CODE)?>
 										</a>
 										<a href="#" class="button" id="gmpShapeAddPointRowBtn" style="float: right;">
-											<?php _e('Add new point', GMP_LANG_CODE)?>
+											<?php _e('Add New Point', GMP_LANG_CODE)?>
 										</a>
 									</td>
 								</tr>
@@ -1351,7 +1422,7 @@
 									<td colspan="2" style="padding-top: 10px; padding-left: 0;">
 										<div class="gmpShapePointRowExample" style="display: none;">
 											<div style="clear: both;">
-												<div style="display: inline-block; width: 49.8%;">
+												<div style="display: inline-block; width: 50%;">
 													<label for="shape_opts_address">
 														<?php _e('Address', GMP_LANG_CODE)?>
 														<?php echo htmlGmp::text('shape_opts[coords][0][address]', array(
@@ -1378,7 +1449,16 @@
 															'attrs' => 'class="gmpShapeCoordY" data-type="coord_y" style="width: 100%;" disabled="disabled"'))?>
 													</label>
 												</div>
-												<a href="#" title="<?php _e('Remove point', GMP_LANG_CODE)?>" class="button" id="gmpShapeRemovePointRowBtn">
+												<div style="display: none; width: 10%;">
+													<label for="shape_opts_radius">
+														<?php _e('Radius', GMP_LANG_CODE)?>
+														<?php echo htmlGmp::text('shape_opts[coords][0][radius]', array(
+															'value' => '',
+															'placeholder' => '10000',
+															'attrs' => 'class="gmpShapeRadius" data-type="radius" data-def="100000" style="width: 100%;" disabled="disabled"'))?>
+													</label>
+												</div>
+												<a href="#" title="<?php _e('Remove Point', GMP_LANG_CODE)?>" class="button" id="gmpShapeRemovePointRowBtn">
 													<i class="fa fa-trash-o"></i>
 												</a>
 											</div>
@@ -1560,7 +1640,7 @@
 						<div style="clear: both;"></div>
 					</div>
 					<div id="gmpMarkerList">
-						<input id="gmpMarkersSearchInput" type="text" placeholder="<?php _e('Search by name', GMP_LANG_CODE)?>" style="display: none; width: 98%;" >
+						<input id="gmpMarkersSearchInput" type="text" placeholder="<?php _e('Search by name', GMP_LANG_CODE)?>" style="display: none; width: 100%; margin: 0;" >
 						<table id="gmpMarkersListGrid" class="supsystic-tbl-pagination-shell"></table>
 					</div>
 					<div id="gmpShapeList">
@@ -1625,4 +1705,27 @@
 		</li>
 		<?php }?>
 	</ul>
+</div>
+<!--Insert To Contact Form Wnd-->
+<div id="gmpInsertToContactFormWnd" style="display: none;" title="<?php _e('Select Contact Form', GMP_LANG_CODE)?>">
+	<?php if($this->isContactFormsInstalled) {?>
+		<?php if($this->contactFormsForSelect) {?>
+			<select name="contact_form" style="width: 100%; margin: 20px 0 0 0;">
+				<?php foreach($this->contactFormsForSelect as $k => $v) { ?>
+					<option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+				<?php }?>
+			</select>
+		<?php } else {?>
+			<span style="font-size: 14px; line-height: 25px;"><?php echo sprintf(
+					'You have no Contact Forms for now. <a target="_blank" href="%s">Create your first contact form</a> then just reload page with your Map settings, and you will see list with available Contact Forms for your Map.',
+					frameCfs::_()->getModule('options')->getTabUrl('forms_add_new')); ?>
+			</span>
+		<?php }?>
+	<?php } else {?>
+		<span style="font-size: 14px; line-height: 25px;"><?php echo sprintf(
+				'You need to install Contact Forms by Supsystic to use this feature. <a target="_blank" href="%s">Install plugin</a> from your admin area, or visit it\'s official page on Wordpress.org <a target="_blank" href="%s">here.</a>',
+				admin_url('plugin-install.php?tab=search&type=term&s=Contact+Forms+by+Supsystic'),
+				'https://wordpress.org/plugins/contact-form-by-supsystic/'); ?>
+		</span>
+	<?php }?>
 </div>

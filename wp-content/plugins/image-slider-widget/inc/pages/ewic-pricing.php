@@ -39,10 +39,10 @@ function ewic_pricing_table() {
         <li class="row_style_2"><span>License</span></li>
         <li class="row_style_4"><span>Unlimited Slider</span></li>
         <li class="row_style_2"><span>Slider on Post, Page or Widget</span></li>       
-        <li class="row_style_4"><span style="font-weight:bold; color:#1064EF">Slider with Bottom Thumbnails</span><a target="_blank" href="http://demo.ghozylab.com/plugins/easy-image-slider-plugin/image-slider-with-thumbnails-at-the-bottom/" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
-        <li class="row_style_2"><span style="font-weight:bold; color:#1064EF">Slider with Right Navigation</span><a target="_blank" href="http://demo.ghozylab.com/plugins/easy-image-slider-plugin/image-slider-with-thumbnails-on-right/" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
-        <li class="row_style_4"><span style="font-weight:bold; color:#1064EF">Slider with Left Thumbnails</span><a target="_blank" href="http://demo.ghozylab.com/plugins/easy-image-slider-plugin/image-slider-with-thumbnails-on-left/" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
-        <li class="row_style_2"><span style="font-weight:bold; color:#1064EF">Slider with Bullet Navigation</span><a target="_blank" href="http://demo.ghozylab.com/plugins/easy-image-slider-plugin/image-slider-with-bullet-navigation/" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
+        <li class="row_style_4"><span style="font-weight:bold; color:#1064EF">Slider with Bottom Thumbnails</span><a target="_blank" href="https://ghozy.link/9vlg3" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
+        <li class="row_style_2"><span style="font-weight:bold; color:#1064EF">Slider with Right Navigation</span><a target="_blank" href="https://ghozy.link/gtjan" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
+        <li class="row_style_4"><span style="font-weight:bold; color:#1064EF">Slider with Left Thumbnails</span><a target="_blank" href="https://ghozy.link/q6zjf" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
+        <li class="row_style_2"><span style="font-weight:bold; color:#1064EF">Slider with Bullet Navigation</span><a target="_blank" href="https://ghozy.link/g74rv" style="text-decoration:underline !important; color: #F77448;">DEMO</a></li>
         <li class="row_style_4"><span>Redirect Image to Specific Link</span></li>
         <li class="row_style_2"><span>360+ Slideshow Effects/Transitions</span></li>
         <li class="row_style_4"><span>390+ Title Effects/Transitions</span></li>

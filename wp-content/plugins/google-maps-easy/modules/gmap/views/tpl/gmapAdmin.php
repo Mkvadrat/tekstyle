@@ -2,7 +2,16 @@
 	<div class="supsystic-item supsystic-panel">
 		<div id="containerWrapper">
 			<ul id="gmpGmapTblNavBtnsShell" class="supsystic-bar-controls">
-				<li title="<?php _e('Delete selected')?>">
+				<li title="<?php _e('Search', GMP_LANG_CODE)?>">
+					<input id="gmpGmapTblSearchTxt" type="text" name="tbl_search" placeholder="<?php _e('Search', GMP_LANG_CODE)?>">
+				</li>
+				<li title="<?php _e('Clone selected', GMP_LANG_CODE)?>">
+					<button class="button" id="gmpGmapCloneGroupBtn" disabled data-toolbar-button>
+						<i class="fa fa-fw fa-clone"></i>
+						<?php _e('Clone selected', GMP_LANG_CODE)?>
+					</button>
+				</li>
+				<li title="<?php _e('Delete selected', GMP_LANG_CODE)?>">
 					<button class="button" id="gmpGmapRemoveGroupBtn" disabled data-toolbar-button>
 						<i class="fa fa-fw fa-trash-o"></i>
 						<?php _e('Delete selected', GMP_LANG_CODE)?>
@@ -14,9 +23,6 @@
 						<?php _e('Clear', GMP_LANG_CODE)?>
 					</button>
 				</li><?php */?>
-				<li title="<?php _e('Search', GMP_LANG_CODE)?>">
-					<input id="gmpGmapTblSearchTxt" type="text" name="tbl_search" placeholder="<?php _e('Search', GMP_LANG_CODE)?>">
-				</li>
 			</ul>
 			<div id="gmpGmapTblNavShell" class="supsystic-tbl-pagination-shell"></div>
 			<div style="clear: both;"></div>

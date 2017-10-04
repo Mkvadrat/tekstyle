@@ -50,13 +50,13 @@ class gmapModelGmp extends modelGmp {
 	}
 	public function getParamsList() {
 		$mapOptKeys = dispatcherGmp::applyFilters('mapParamsKeys', 
-				array('width_units', 'adapt_map_to_screen_height',
+				array('width_units', 'membershipEnable', 'adapt_map_to_screen_height',
 					'type' /*used "map_type" insted - as this was already nulled*/, 'map_type', 'map_display_mode', 'map_center', 'language',
 					'enable_zoom', 'enable_mouse_zoom' /*we used "mouse_wheel_zoom" insted of this - same reason as prev. one*/, 'zoom', 'zoom_min', 'zoom_max',
 					'type_control', 'zoom_control', 'street_view_control', 'pan_control', 'overview_control', 'draggable',
 					'dbl_click_zoom', 'mouse_wheel_zoom', 'map_stylization',
 					'marker_title_color', 'marker_title_size', 'marker_title_size_units',
-					'marker_desc_size', 'marker_desc_size_units', 'hide_marker_tooltip',
+					'marker_desc_size', 'marker_desc_size_units', 'hide_marker_tooltip', 'center_on_cur_marker_infownd',
 					'marker_infownd_width', 'marker_infownd_width_units', 'marker_infownd_height', 'marker_infownd_height_units', 'marker_infownd_bg_color',
 					'marker_clasterer', 'marker_clasterer_icon', 'marker_clasterer_icon_width', 'marker_clasterer_icon_height', 'marker_clasterer_grid_size',
 					// Maybe PRO params - but let them be here - to avoid dublications
@@ -127,6 +127,71 @@ class gmapModelGmp extends modelGmp {
 		} else
 			$this->pushError (__('Invalid Map ID', GMP_LANG_CODE));
 		return false;
+	}
+	public function cloneMapGroup($ids) {
+		if(!is_array($ids)) $ids = array($ids);
+
+		$ids = array_filter(array_map('intval', $ids));	// Remove all empty values
+
+		if(!empty($ids)) {
+			foreach($ids as $id) {
+				if($map = frameGmp::_()->getTable('maps')->get('*', array('id' => (int)$id), '', 'row')) {
+					$mapId = $map['id'];
+					$map = $this->prepareDataToClone($map, false, true);
+
+					if($clonedMapId = frameGmp::_()->getTable('maps')->insert($map)) {
+						// Markers
+						if($markers = frameGmp::_()->getTable('marker')->orderBy('sort_order ASC')->get('*', array('map_id' => $mapId))) {
+							foreach ($markers as $marker) {
+								$marker = $this->prepareDataToClone($marker, $clonedMapId, true);
+
+								if(!frameGmp::_()->getTable('marker')->insert($marker)) {
+									$this->pushError(frameGmp::_()->getTable('marker')->getErrors());
+									return $this->haveErrors();	// To break foreach cycle
+								}
+							}
+						} else
+							$this->pushError(frameGmp::_()->getTable('marker')->getErrors());
+						// Shapes
+						if(frameGmp::_()->getModule('shape') && $shapes = frameGmp::_()->getTable('shape')->orderBy('sort_order ASC')->get('*', array('map_id' => $mapId))) {
+							foreach ($shapes as $shape) {
+								$shape = $this->prepareDataToClone($shape, $clonedMapId);
+
+								if(!frameGmp::_()->getTable('shape')->insert($shape)) {
+									$this->pushError(frameGmp::_()->getTable('shape')->getErrors());
+									return $this->haveErrors();	// To break foreach cycle
+								}
+							}
+						} else
+							$this->pushError(frameGmp::_()->getTable('shape')->getErrors());
+						// Heatmap layer
+						if(frameGmp::_()->getModule('heatmap') && $heatmap = frameGmp::_()->getTable('heatmap')->get('*', array('map_id' => $mapId), '', 'row')) {
+							$heatmap = $this->prepareDataToClone($heatmap, $clonedMapId);
+
+							if(!frameGmp::_()->getTable('heatmap')->insert($heatmap))
+								$this->pushError(frameGmp::_()->getTable('heatmap')->getErrors());
+						} else
+							$this->pushError(frameGmp::_()->getTable('heatmap')->getErrors());
+					} else
+						$this->pushError(frameGmp::_()->getTable('map')->getErrors());
+
+				} else
+					$this->pushError(frameGmp::_()->getTable('map')->getErrors());
+			}
+		} else
+			$this->pushError(__('Invalid ID', GMP_LANG_CODE));
+
+		return $this->haveErrors();
+	}
+	public function prepareDataToClone($data, $newMapId = false, $date = false) {
+		unset($data['id']);
+		if($newMapId)
+			$data['map_id'] = $newMapId;	// We do not need to set map id for maps
+		if($date)
+			$data['create_date'] = date('Y-m-d H:i:s');	// We need to set date here only for maps amd markers
+		else
+			unset($data['create_date']);
+		return $data;
 	}
 	public function getMapByTitle($title) {
 		$map = frameGmp::_()->getTable('maps')->get('*', array('title' => $title), '', 'row');
